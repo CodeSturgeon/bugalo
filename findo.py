@@ -8,14 +8,15 @@ log = logging.getLogger()
 log.setLevel(logging.DEBUG)
 log.addHandler(logging.StreamHandler())
 
-search_path = '/Users/fish/Projects/bugalo/test'
+search_path = '/home/flute/for_fish/20100914/kaspT20_2010-09-13/'
 
 packs = []
 
 def make_pack(path):
     meta = {}
 
-    meta['import_path'] = path
+    meta['full_path'] = path
+    meta['import_path'] = path.split(search_path)[1].lstrip('/\\')
     meta['folder'] = os.path.split(path)[1]
 
     meta['files'] = []
@@ -52,16 +53,16 @@ def chunkify_sprinkle(no_chunks, fgroup_list):
     for fg in fgroup_list:
         chunks[spin].append(fg)
         spin += 1
-        if spin = no_chunks: spin = 0
+        if spin == no_chunks: spin = 0
     return chunks
 
 def chunkify_fifo(max_size, fgroup_list):
     chunks = []
     chunk = []
-    chunk_total = 0
+    chunk_size = 0
     for fg in fgroup_list:
-        fg_size = fg['total_size']
-        if chunk_total + fg_size > max_size:
+        fg_size = int(fg['total_size'])
+        if chunk_size + fg_size > max_size:
             chunks.append(chunk)
             chunk = []
             chunk_size = 0
@@ -72,4 +73,7 @@ def chunkify_fifo(max_size, fgroup_list):
 
 import pprint as pp
 packs = find_packs(search_path)
-pp.pprint(packs)
+chunks = chunkify_fifo((1024*1024),packs)
+for chunk in chunks:
+    print 'x'*50
+    pp.pprint(chunks)
