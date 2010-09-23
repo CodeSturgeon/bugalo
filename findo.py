@@ -6,7 +6,8 @@ from hashlib import md5, sha1
 
 from optparse import OptionParser
 parser = OptionParser()
-parser.add_option("-s", "--source", dest="source", help="source path")
+parser.add_option("-s", "--source", dest="source", help="source path",
+                    default = '/home/flute/for_fish/20100914/')
 parser.add_option("-c", "--chunk-size", dest="size", type="int", default=10,
                     help="chunk size in MB")
 parser.add_option("-d", "--debug", dest="debug", action="store_true",
@@ -19,8 +20,7 @@ log.setLevel(logging.WARN)
 log.addHandler(logging.StreamHandler())
 if options.debug: log.setLevel(logging.DEBUG)
 
-search_path = '/home/flute/for_fish/20100914/kaspT20_2010-09-13/'
-search_path = '/home/flute/for_fish/20100914/'
+search_path = options.source
 
 
 packs = []
