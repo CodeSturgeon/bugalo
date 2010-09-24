@@ -104,7 +104,6 @@ for chunk in chunks:
     log.info('Chunk %3d - %4.2f MB (%4d%% full)'%(chunk_no, (t_size/MB),
                                     (float(t_size)/float(chunk_size))*100))
     if options.nozip: continue
-    t_size.oh_shit
     #zfile = zipfile.ZipFile(os.path.join(search_path,'chunk_%s.zip'%chunk_no),'w')
     zfile = zipfile.ZipFile(os.path.join('.','chunk_%03d.zip'%chunk_no),'w')
     for group in chunk:
