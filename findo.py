@@ -9,6 +9,8 @@ from optparse import OptionParser
 parser = OptionParser()
 parser.add_option("-s", "--source", dest="source", help="source path",
                     default = '/home/flute/for_fish/20100914/')
+parser.add_option("-z", "--zip-path", dest="zip_path", help="zip output path",
+                    default = '.')
 parser.add_option("-c", "--chunk-size", dest="size", type="int", default=10,
                     help="chunk size in MB")
 parser.add_option("-v", "--verbose", dest="verbose", action="store_true",
@@ -104,8 +106,7 @@ for chunk in chunks:
     log.info('Chunk %3d - %4.2f MB (%4d%% full)'%(chunk_no, (t_size/MB),
                                     (float(t_size)/float(chunk_size))*100))
     if options.nozip: continue
-    #zfile = zipfile.ZipFile(os.path.join(search_path,'chunk_%s.zip'%chunk_no),'w')
-    zfile = zipfile.ZipFile(os.path.join('.','chunk_%03d.zip'%chunk_no),'w')
+    zfile = zipfile.ZipFile(os.path.join(options.zip_path,'chunk_%03d.zip'%chunk_no),'w')
     for group in chunk:
         for f in group['files']:
             zfile.write(os.path.join(group['full_path'],f['name']),os.path.join(group['import_path'],f['name']))
