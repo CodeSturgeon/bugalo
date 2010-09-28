@@ -1,2 +1,2 @@
-  python setup.py develop
-  findo -h
+    python setup.py develop
+    findo -h
