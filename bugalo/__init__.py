@@ -1,4 +1,5 @@
 import os
+from os.path import isfile
 from hashlib import md5, sha1
 import logging
 
@@ -17,7 +18,6 @@ def make_pack(path, search_path):
         for entity in files:
             if entity[0] == '.': next
             file_path = os.path.join(root,entity)
-            log.debug(file_path)
             file_cont = open(file_path, 'rb').read()
             file_meta = {}
             file_meta['name'] = entity
@@ -32,16 +32,18 @@ def make_pack(path, search_path):
 def find_packs(path, search_path):
     log.debug('looking for packs in %s'%path)
     entities = os.listdir(path)
-    file_finder = lambda last, fname: last or \
-                                    os.path.isfile(os.path.join(path,fname))
+    
+    # Look for files in the dir contents and make pack if found
+    file_finder = lambda last, fname: last or isfile(os.path.join(path,fname))
     if reduce(file_finder, entities, False):
         log.debug('pack found in %s'%path)
         return make_pack(path,search_path)
 
+    # No files found, recurse on all directories
     packs = []
     for dname in entities:
         ret = find_packs(os.path.join(path,dname),search_path)
-        if len(ret)>0: packs.append(ret)
+        if len(ret)>0: packs.append(ret) # Ignore empty results
 
     return packs
 
