@@ -7,7 +7,7 @@ from optparse import OptionParser
 from bugalo import *
 
 import zipfile
-import pprint as pp
+from pprint import pprint as pp
 
 def main():
     parser = OptionParser()
@@ -37,7 +37,8 @@ def main():
 
     packs = []
 
-    packs = find_packs(search_path)
+    packs = find_packs(search_path, search_path)
+    #pp(packs)
     chunk_size = MB * options.size
     chunks = chunkify_fifo(chunk_size,packs)
     chunk_no = 0
@@ -54,6 +55,6 @@ def main():
         zfile = zipfile.ZipFile(zfile_path, 'w')
         for group in chunk:
             for f in group['files']:
-                zfile.write(os.path.join(group['full_path'],f['name']),
-                            os.path.join(group['import_path'],f['name']))
+                zfile.write(os.path.join(group['full_path'],f['path'],f['name']),
+                            os.path.join(group['import_path'],f['path'],f['name']))
         zfile.close()

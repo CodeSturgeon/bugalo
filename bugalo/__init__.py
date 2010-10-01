@@ -13,29 +13,36 @@ def make_pack(path, search_path):
 
     meta['files'] = []
     meta['total_size'] = 0
-    for entity in os.listdir(path):
-        if entity[0] == '.': next
-        file_path = os.path.join(path,entity)
-        file_cont = open(file_path, 'rb').read()
-        file_meta = {}
-        file_meta['name'] = entity
-        file_meta['md5'] = md5(file_cont).hexdigest()
-        file_meta['sha1'] = sha1(file_cont).hexdigest()
-        file_meta['size'] = os.path.getsize(file_path)
-        meta['total_size'] += file_meta['size']
-        meta['files'].append(file_meta)
+    for root, dirs, files in os.walk(path):
+        for entity in files:
+            if entity[0] == '.': next
+            file_path = os.path.join(root,entity)
+            log.debug(file_path)
+            file_cont = open(file_path, 'rb').read()
+            file_meta = {}
+            file_meta['name'] = entity
+            file_meta['path'] = root.split(path)[1].lstrip('/\\')
+            file_meta['md5'] = md5(file_cont).hexdigest()
+            file_meta['sha1'] = sha1(file_cont).hexdigest()
+            file_meta['size'] = os.path.getsize(file_path)
+            meta['total_size'] += file_meta['size']
+            meta['files'].append(file_meta)
     return meta
 
-def find_packs(path):
+def find_packs(path, search_path):
     log.debug('looking for packs in %s'%path)
+    entities = os.listdir(path)
+    file_finder = lambda last, fname: last or \
+                                    os.path.isfile(os.path.join(path,fname))
+    if reduce(file_finder, entities, False):
+        log.debug('pack found in %s'%path)
+        return make_pack(path,search_path)
+
     packs = []
-    for root, dirs, files in os.walk(path):
-        log.debug('sniffing %s'%root)
-        if len(dirs) and len(files):
-            log.warn("yucking %s"%root)
-        elif len(files):
-            log.debug('pack found in %s'%root)
-            packs.append(make_pack(root,path))
+    for dname in entities:
+        ret = find_packs(os.path.join(path,dname),search_path)
+        if len(ret)>0: packs.append(ret)
+
     return packs
 
 def chunkify_sprinkle(no_chunks, fgroup_list):
