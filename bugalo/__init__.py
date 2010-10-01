@@ -32,18 +32,21 @@ def make_pack(path, search_path):
 def find_packs(path, search_path):
     log.debug('looking for packs in %s'%path)
     entities = os.listdir(path)
+
+    # Remove dot files from the listing
+    entities = filter(lambda fname: fname[0]!='.', entities)
     
     # Look for files in the dir contents and make pack if found
     file_finder = lambda last, fname: last or isfile(os.path.join(path,fname))
     if reduce(file_finder, entities, False):
         log.debug('pack found in %s'%path)
-        return make_pack(path,search_path)
+        return [make_pack(path,search_path)]
 
     # No files found, recurse on all directories
     packs = []
     for dname in entities:
         ret = find_packs(os.path.join(path,dname),search_path)
-        if len(ret)>0: packs.append(ret) # Ignore empty results
+        if len(ret)>0: packs.extend(ret) # Ignore empty results
 
     return packs
 
