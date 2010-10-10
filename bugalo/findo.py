@@ -35,25 +35,36 @@ def main():
     search_path = options.source
     MB = (1024*1024)
 
-    packs = []
+    bundles = []
 
-    packs = find_packs(search_path, search_path)
+    groups = find_groups(search_path, search_path)
+
+    # Extract bundles and inject full_path and import_path
+    bundles = []
+    for group in groups:
+        for bundle in group['bundles']:
+            b = bundle
+            b['full_path'] = group['full_path']
+            b['import_path'] = group['import_path']
+            bundles.append(b)
+
     chunk_size = MB * options.size
-    chunks = chunkify_fifo(chunk_size,packs)
+    chunks = chunkify_fifo(bundles, chunk_size)
     chunk_no = 0
     for chunk in chunks:
         chunk_no += 1 # Yes, we start at 1
-        t_size = 0
-        for pack in chunk:
-            t_size += pack['total_size']
+        t_size = sum([b['size'] for b in chunk])
+        #t_size = 0
+        #for bundle in chunk:
+        #    t_size += bundle['total_size']
         log.info('Chunk %3d - %6.2f MB (%4d%% full)'%(chunk_no,
                                         (float(t_size)/float(MB)),
                                         (float(t_size)/float(chunk_size))*100))
         if options.nozip: continue
         zfile_path = os.path.join(options.zip_path,'chunk_%03d.zip'%chunk_no)
         zfile = zipfile.ZipFile(zfile_path, 'w')
-        for pack in chunk:
-            for f in pack['files']:
-                zfile.write(os.path.join(pack['full_path'],f['path'],f['name']),
-                            os.path.join(pack['import_path'],f['path'],f['name']))
+        for bundle in chunk:
+            for f in bundle['files']:
+                zfile.write(os.path.join(bundle['full_path'],f['path'],f['name']),
+                        os.path.join(bundle['import_path'],f['path'],f['name']))
         zfile.close()
