@@ -15,7 +15,7 @@ def main():
     parser = OptionParser(usage=usage)
     parser.add_option("-z", "--zip-path", dest="zip_path", help="zip output path",
                         default = '.')
-    parser.add_option("-c", "--chunk-size", dest="size", type="int", default=10,
+    parser.add_option("-c", "--chunk-size", dest="size", type="int", default=500,
                         help="chunk size in MB")
     parser.add_option("-v", "--verbose", dest="verbose", action="store_true",
                         default=False, help="turn on info messages")
