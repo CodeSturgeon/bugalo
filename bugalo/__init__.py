@@ -89,5 +89,6 @@ def chunkify_fifo(item_list, max_size = 500*MB ):
             chunk_size = 0
         chunk.append(item)
         chunk_size += item_size
+    chunks.append(chunk) # Catch the last chunk
     return chunks
 
