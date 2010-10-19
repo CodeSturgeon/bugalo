@@ -10,13 +10,15 @@ from bugalo import *
 import zipfile
 from pprint import pprint as pp
 
+MB = (1024*1024)
+
 def main():
     usage = "Usage: %prog [options] path [path, ...] "
     parser = OptionParser(usage=usage)
     parser.add_option("-z", "--zip-path", dest="zip_path", help="zip output path",
                         default = '.')
     parser.add_option("-c", "--chunk-size", dest="size", type="int", default=500,
-                        help="chunk size in MB")
+                        help="chunk size in MiB")
     parser.add_option("-v", "--verbose", dest="verbose", action="store_true",
                         default=False, help="turn on info messages")
     parser.add_option("-d", "--debug", dest="debug", action="store_true",
@@ -36,11 +38,8 @@ def main():
         parser.print_usage()
         sys.exit(1)
 
-    MB = (1024*1024)
-
     for search_path in args:
         groups = find_groups(search_path, search_path)
-        pp(groups)
 
         # Extract bundles and inject full_path and import_path
         bundles = []
@@ -57,9 +56,6 @@ def main():
         for chunk in chunks:
             chunk_no += 1 # Yes, we start at 1
             t_size = sum([b['size'] for b in chunk])
-            #t_size = 0
-            #for bundle in chunk:
-            #    t_size += bundle['total_size']
             log.info('Chunk %3d - %6.2f MB (%4d%% full)'%(chunk_no,
                                             (float(t_size)/float(MB)),
                                             (float(t_size)/float(chunk_size))*100))
