@@ -34,7 +34,7 @@ def make_group(path, base_path):
     if total_size < max_bundle_size:
         bundles = [{'size':total_size, 'files':group_files}]
     else:
-        chunks = chunkify_fifo(files)
+        chunks = chunkify_fifo(group_files)
         for chunk in chunks:
             total = sum([f['size'] for f in chunk])
             bundles.append({'size':total, 'files':chunk})
