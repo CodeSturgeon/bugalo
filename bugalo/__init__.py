@@ -84,7 +84,12 @@ def chunkify_fifo(item_list, max_size = 500*MB ):
     chunk_size = 0
     for item in item_list:
         log.debug("I - %s"%item)
-        item_size = int(item['size'])
+        try:
+            item_size = int(item['size'])
+        except Exception, e:
+            log.error(item_list)
+            log.error(item)
+            raise e
         if item_size > max_size:
             log.warn('item size > chunk size - %s'%item['full_path'])
         if chunk_size + item_size > max_size and len(chunk) > 0:
