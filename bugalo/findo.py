@@ -97,7 +97,7 @@ def main():
                 except AttributeError:
                     log.warn('%s is not named correctly - skipping'%abs_src)
                     continue
-                prefix = '%s_%s_'%(vendor, now_date)
+                prefix = '%s_%s'%(vendor, now_date)
                 seqs[vendor] = find_and_zip(abs_src, opt.size, opt.zip_path,
                                            prefix, opt.nozip,
                                            seqs.get(vendor,0))
