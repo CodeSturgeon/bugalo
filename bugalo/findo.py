@@ -15,9 +15,10 @@ from pprint import pprint as pp
 MB = (1024*1024)
 log = logging.getLogger()
 
-def find_and_zip(search_path, zsize, zpath='.', zprefix='', nozip=False):
+def find_and_zip(search_path, zsize, zpath='.', zprefix='', nozip=False, seq=0):
     # This should be considered to be at the batch level
     # All files found are assumed to be from the same source export
+    # seq is the number of the previous file in the sequence
     groups = find_groups(search_path)
 
     # Extract bundles and inject full_path and import_path
@@ -31,9 +32,9 @@ def find_and_zip(search_path, zsize, zpath='.', zprefix='', nozip=False):
 
     chunk_size = MB * zsize
     chunks = chunkify_fifo(bundles, chunk_size)
-    chunk_no = 0
+    chunk_no = seq
     for chunk in chunks:
-        chunk_no += 1 # Yes, we start at 1
+        chunk_no += 1
         t_size = sum([b['size'] for b in chunk])
         log.info('Chunk %3d - %6.2f MB (%4d%% full)'%(chunk_no,
                                         (float(t_size)/float(MB)),
@@ -47,6 +48,9 @@ def find_and_zip(search_path, zsize, zpath='.', zprefix='', nozip=False):
                 z_ip = os.path.join(bundle['import_path'],f['path'],f['name'])
                 zfile.write(z_fp, z_ip)
         zfile.close()
+
+    # Return the last chunk_no for use in next sequence
+    return chunk_no
 
 def main():
     usage = "Usage: %prog [options] path [path, ...] "
@@ -78,6 +82,7 @@ def main():
     if opt.batch:
         now_date = datetime.datetime.now().strftime('%Y-%m-%d')
         batch_re = re.compile('(?P<name>.*?)_(?P<date>.*)')
+        seqs = {}
         for batch_path in args:
             source_folders = os.listdir(batch_path)
             for src in source_folders:
@@ -93,7 +98,9 @@ def main():
                     log.warn('%s is not named correctly - skipping'%abs_src)
                     continue
                 prefix = '%s_%s_'%(vendor, now_date)
-                find_and_zip(abs_src, opt.size, opt.zip_path, prefix, opt.nozip)
+                seqs[vendor] = find_and_zip(abs_src, opt.size, opt.zip_path,
+                                           prefix, opt.nozip,
+                                           seqs.get(vendor,0))
         return
 
     for path in args:
