@@ -16,7 +16,7 @@ log = logging.getLogger()
 def find_and_zip(search_path, zsize, zpath='.', zprefix='', nozip=False):
     # This should be considered to be at the batch level
     # All files found are assumed to be from the same source export
-    groups = find_groups(search_path, search_path)
+    groups = find_groups(search_path)
 
     # Extract bundles and inject full_path and import_path
     bundles = []

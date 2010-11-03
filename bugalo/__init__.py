@@ -7,11 +7,11 @@ log = logging.getLogger()
 MB = (1024*1024)
 max_bundle_size = 500 * MB
 
-def make_group(path, search_path):
+def make_group(path, base_path):
     meta = {}
 
     meta['full_path'] = path
-    meta['import_path'] = path.split(search_path)[1].lstrip('/\\')
+    meta['import_path'] = path.split(base_path)[1].lstrip('/\\')
     meta['folder'] = os.path.split(path)[1]
 
     group_files = []
@@ -43,8 +43,12 @@ def make_group(path, search_path):
 
     return meta
 
-def find_groups(path, search_path):
+# FIXME can I base_path=path here? path should be base_path... or is that base_path?
+def find_groups(path, base_path=None):
     log.debug('looking for group in %s'%path)
+
+    if base_path == None: base_path = path
+
     entities = os.listdir(path)
 
     # Remove dot files from the listing
@@ -55,12 +59,12 @@ def find_groups(path, search_path):
     file_finder = lambda last, fname: last or isfile(os.path.join(path,fname))
     if reduce(file_finder, entities, False):
         log.debug('group found in %s'%path)
-        return [make_group(path,search_path)]
+        return [make_group(path,base_path)]
 
     # No files found, recurse on all directories
     groups = []
     for dname in entities:
-        ret = find_groups(os.path.join(path,dname),search_path)
+        ret = find_groups(os.path.join(path,dname),base_path)
         if len(ret)>0: groups.extend(ret) # Ignore empty results
 
     return groups
