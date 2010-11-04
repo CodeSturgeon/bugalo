@@ -80,7 +80,7 @@ def main():
         sys.exit(1)
 
     if opt.batch:
-        now_date = datetime.datetime.now().strftime('%Y-%m-%d')
+        now_date = datetime.datetime.now().strftime('%Y%m%d')
         batch_re = re.compile('(?P<name>.*?)_(?P<date>.*)')
         seqs = {}
         for batch_path in args:
