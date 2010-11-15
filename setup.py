@@ -11,6 +11,7 @@ setup(name="bugalo",
       entry_points = {
           'console_scripts': [
               'findo = bugalo.findo:main',
+              'flexo = bugalo.flexo:main',
           ]
       }
      )

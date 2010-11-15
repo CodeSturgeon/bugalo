@@ -1,11 +1,49 @@
 import os
 from os.path import isfile
 from hashlib import md5, sha1
+import zipfile
 import logging
 
 log = logging.getLogger()
 MB = (1024*1024)
 max_bundle_size = 500 * MB
+
+def find_and_zip(search_path, zsize, zpath='.', zprefix='', nozip=False, seq=0):
+    # This should be considered to be at the batch level
+    # All files found are assumed to be from the same source export
+    # seq is the number of the previous file in the sequence
+    groups = find_groups(search_path)
+
+    # Extract bundles and inject full_path and import_path
+    bundles = []
+    for group in groups:
+        for bundle in group['bundles']:
+            b = bundle
+            b['full_path'] = group['full_path']
+            b['import_path'] = group['import_path']
+            bundles.append(b)
+
+    chunk_size = MB * zsize
+    chunks = chunkify_fifo(bundles, chunk_size)
+    chunk_no = seq
+    for chunk in chunks:
+        chunk_no += 1
+        t_size = sum([b['size'] for b in chunk])
+        log.info('%s%03d - %6.2f MB (%4d%% full)'%(zprefix, chunk_no,
+                                        (float(t_size)/float(MB)),
+                                        (float(t_size)/float(chunk_size))*100))
+        if nozip: continue
+        zfile_path = os.path.join(zpath,'%s%03d.zip'%(zprefix,chunk_no))
+        zfile = zipfile.ZipFile(zfile_path, 'w')
+        for bundle in chunk:
+            for f in bundle['files']:
+                z_fp = os.path.join(bundle['full_path'],f['path'],f['name'])
+                z_ip = os.path.join(bundle['import_path'],f['path'],f['name'])
+                zfile.write(z_fp, z_ip)
+        zfile.close()
+
+    # Return the last chunk_no for use in next sequence
+    return chunk_no
 
 def make_group(path, base_path):
     meta = {}
