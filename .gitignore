@@ -2,6 +2,7 @@
 build
 dist
 test
+.couchapprc
 *.pyc
 *.swp
 *.zip
