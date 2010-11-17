@@ -39,7 +39,11 @@ def find_and_zip(search_path, zsize, zpath='.', zprefix='', nozip=False, seq=0):
             for f in bundle['files']:
                 z_fp = os.path.join(bundle['full_path'],f['path'],f['name'])
                 z_ip = os.path.join(bundle['import_path'],f['path'],f['name'])
-                zfile.write(z_fp, z_ip)
+                try:
+                    zfile.write(z_fp, z_ip)
+                except Exception, e:
+                    log.error('trying to zip: %s'%z_fp)
+                    raise e
         zfile.close()
 
     # Return the last chunk_no for use in next sequence
