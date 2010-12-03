@@ -6,3 +6,4 @@ test
 *.pyc
 *.swp
 *.zip
+*.json
