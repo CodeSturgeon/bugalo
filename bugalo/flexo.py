@@ -48,7 +48,7 @@ def main():
         sys.exit(1)
 
     # FIXME convert to ISO
-    now_date = datetime.datetime.now().strftime('%Y%m%d')
+    now_date = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
     batch_re = re.compile('(?P<name>.*?)_(?P<date>.*)')
     sources = []
     for batch_path in args:
