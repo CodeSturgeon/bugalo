@@ -42,7 +42,24 @@ def find_and_zip(search_path, zsize, zpath='.', zprefix='', nozip=False, seq=0):
                 try:
                     zfile.write(z_fp, z_ip)
                 except Exception, e:
+                    import time
                     log.error('trying to zip: %s'%z_fp)
+                    st = os.stat(z_fp)
+                    log.error(st)
+                    log.error('waiting a moment')
+                    time.sleep(5)
+                    st = os.stat(z_fp)
+                    log.error(st)
+                    log.error('touching file')
+                    # http://technet.microsoft.com/en-us/library/bb490886.aspx
+                    ret = os.system('copy /b '+z_fp+'+,,')
+                    log.error('ret: '+str(ret))
+                    st = os.stat(z_fp)
+                    log.error(st)
+                    log.error('waiting a moment')
+                    time.sleep(5)
+                    st = os.stat(z_fp)
+                    log.error(st)
                     raise e
         zfile.close()
 
