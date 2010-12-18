@@ -44,22 +44,20 @@ def find_and_zip(search_path, zsize, zpath='.', zprefix='', nozip=False, seq=0):
                 except Exception, e:
                     import time
                     log.error('trying to zip: %s'%z_fp)
-                    st = os.stat(z_fp)
-                    log.error(st)
+                    log.error(os.stat(z_fp))
                     log.error('waiting a moment')
                     time.sleep(5)
-                    st = os.stat(z_fp)
-                    log.error(st)
+                    log.error(os.stat(z_fp))
                     log.error('touching file')
                     # http://technet.microsoft.com/en-us/library/bb490886.aspx
-                    ret = os.system('copy /b '+z_fp+'+,,')
-                    log.error('ret: '+str(ret))
-                    st = os.stat(z_fp)
-                    log.error(st)
+                    cmd = 'copy /b '+z_fp+'+,,'
+                    log.error(cmd)
+                    ret = os.system(cmd)
+                    log.error('ret: %s'%ret)
+                    log.error(os.stat(z_fp))
                     log.error('waiting a moment')
                     time.sleep(5)
-                    st = os.stat(z_fp)
-                    log.error(st)
+                    log.error(os.stat(z_fp))
                     raise e
         zfile.close()
 
